@@ -1,0 +1,26 @@
+/* cairo on AmigaOS 3.x, 68k. MIT, Copyright (c) 2026 Dalsin Limited. */
+#define WORDS_BIGENDIAN 1
+#define FLOAT_WORDS_BIGENDIAN 1
+#define SIZEOF_VOID_P 4
+#define SIZEOF_INT 4
+#define SIZEOF_LONG 4
+#define SIZEOF_LONG_LONG 8
+#define SIZEOF_SIZE_T 4
+#define HAVE_STDINT_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_FCNTL_H 1
+#define HAVE_UNISTD_H 1
+#define HAVE_SIGNAL_H 1
+#define HAVE_SYS_STAT_H 1
+#define HAVE_TIME_H 1
+#define HAVE_SETJMP_H 1
+#define HAVE_UINT64_T 1
+#define HAVE_ZLIB 1
+#define CAIRO_HAS_PTHREAD 1
+#define CAIRO_HAS_REAL_PTHREAD 1
+#define HAVE_C11_ATOMIC_PRIMITIVES 1
+#define HAVE_FCINIT 1
+#define HAVE_FCFINI 1
+#define HAVE_FT_LOAD_NO_SVG 1
+#define HAS_PIXMAN_GLYPHS 1
+#define WARN_UNUSED_RESULT __attribute__((__warn_unused_result__))
