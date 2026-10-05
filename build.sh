@@ -45,9 +45,13 @@ archive() {
     rm -rf "$obj"; mkdir -p "$obj"
     for f in "$@"; do
         o="$obj/$(echo "$f" | tr '/' '_' | sed 's/\.[a-z]*$//').o"
+        # GCC 16.2 stops with an internal error (reload, gen_rtx_SUBREG) on
+        # this file at -O2 with -m68020-60; -Os compiles it.
+        extra=
+        case "$f" in *cairo-mesh-pattern-rasterizer.c) extra=-Os ;; esac
         case "$f" in
-            *.cc|*.cpp) $CXX $CFLAGS ${XFLAGS:-} -c "$f" -o "$o" ;;
-            *) $CC $CFLAGS ${XFLAGS:-} -c "$f" -o "$o" ;;
+            *.cc|*.cpp) $CXX $CFLAGS ${XFLAGS:-} $extra -c "$f" -o "$o" ;;
+            *) $CC $CFLAGS ${XFLAGS:-} $extra -c "$f" -o "$o" ;;
         esac
     done
     rm -f "$OUT/lib/lib$name.a"
