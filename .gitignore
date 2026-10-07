@@ -1,0 +1,7 @@
+# Build output from build.sh (regenerable)
+/out/
+/work/
+/tarballs/
+
+# Written by build.sh from the pixman tarball
+/config/pixman/pixman-version.h
