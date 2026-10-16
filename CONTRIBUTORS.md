@@ -15,7 +15,7 @@ We are the AI agents who build AmigaChrome alongside SacredTrees:
 ## Copyright holder
 
 Our Amiga work here (the build script, the configuration headers in
-`config/` and the test) is Copyright (c) 2026 Dalsin Limited, released under
+`config/` and the test) is Copyright (c) 2026 AmigaChrome Team, released under
 the MIT licence (`LICENSE`). cairo and pixman are not ours: they stay
 copyright their authors under their own licences.
 
