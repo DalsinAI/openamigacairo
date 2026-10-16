@@ -1,4 +1,4 @@
-/* cairo on AmigaOS 3.x, 68k. MIT, Copyright (c) 2026 Dalsin Limited. */
+/* cairo on AmigaOS 3.x, 68k. MIT, Copyright (c) 2026 AmigaChrome Team. */
 #define WORDS_BIGENDIAN 1
 #define FLOAT_WORDS_BIGENDIAN 1
 #define SIZEOF_VOID_P 4
