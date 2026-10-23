@@ -9,6 +9,11 @@
 #   TARBALLS     folder holding the upstream tarballs listed in SOURCES
 #                (default ./tarballs); the script checks their SHA-256
 #   JOBS         parallel jobs for CMake/make builds (default 2)
+#   CAIRO_FONTS  "ft": cairo's FreeType and fontconfig font backend, which
+#                needs both in DEPS_PREFIX; "user": user fonts only, for
+#                programs that draw their own glyphs, such as OpenBrowser on
+#                openfont.library: no FreeType, fontconfig or Expat
+#                (default ft)
 #
 # usage: ./build.sh
 set -eu
@@ -59,7 +64,21 @@ archive() {
     echo "lib$name.a: $(wc -c < "$OUT/lib/lib$name.a") bytes"
 }
 
-DEPS=${DEPS_PREFIX:?set DEPS_PREFIX to a prefix with FreeType, fontconfig, libpng and zlib}
+CAIRO_FONTS=${CAIRO_FONTS:-ft}
+case "$CAIRO_FONTS" in
+    ft) DEPS=${DEPS_PREFIX:?set DEPS_PREFIX to a prefix with FreeType, fontconfig, libpng and zlib}
+        FONT_SOURCES="src/cairo-ft-font.c src/cairo-colr-glyph-render.c src/cairo-svg-glyph-render.c"
+        FEATURES="$HERE/config/cairo"
+        ;;
+    user) DEPS=${DEPS_PREFIX:?set DEPS_PREFIX to a prefix with libpng and zlib}
+        FONT_SOURCES=
+        # the features without the FreeType and fontconfig backend
+        FEATURES="$WORK/features-user"
+        mkdir -p "$FEATURES"
+        grep -v 'CAIRO_HAS_FT_FONT\|CAIRO_HAS_FC_FONT' "$HERE/config/cairo/cairo-features.h" > "$FEATURES/cairo-features.h"
+        ;;
+    *) echo "CAIRO_FONTS must be ft or user"; exit 2 ;;
+esac
 unpack pixman pixman-0.46.4.tar.gz d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c
 cd "$WORK/pixman/pixman-0.46.4"
 sed -e 's/@PIXMAN_VERSION_MAJOR@/0/; s/@PIXMAN_VERSION_MINOR@/46/; s/@PIXMAN_VERSION_MICRO@/4/' \
@@ -102,7 +121,7 @@ cp pixman/pixman.h "$HERE/config/pixman/pixman-version.h" "$OUT/include/pixman-1
 
 unpack cairo cairo-1.18.6.tar.xz 1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4
 cd "$WORK/cairo/cairo-1.18.6"
-XFLAGS="-include pthread.h -DHAVE_CONFIG_H -DCAIRO_COMPILATION -I$HERE/config/cairo -Isrc -I$DEPS/include \
+XFLAGS="-include pthread.h -DHAVE_CONFIG_H -DCAIRO_COMPILATION -I$FEATURES -I$HERE/config/cairo -Isrc -I$DEPS/include \
     -I$OUT/include/pixman-1 -I$DEPS/include/freetype2" archive cairo \
     src/cairo-analysis-surface.c \
     src/cairo-arc.c \
@@ -222,8 +241,8 @@ XFLAGS="-include pthread.h -DHAVE_CONFIG_H -DCAIRO_COMPILATION -I$HERE/config/ca
     src/cairo-tag-stack.c \
     src/cairo-deflate-stream.c \
     src/cairo-png.c \
-    src/cairo-ft-font.c \
-    src/cairo-colr-glyph-render.c \
-    src/cairo-svg-glyph-render.c
+    $FONT_SOURCES
 mkdir -p "$OUT/include/cairo"
-cp src/cairo.h src/cairo-deprecated.h src/cairo-ft.h src/cairo-version.h "$HERE/config/cairo/cairo-features.h" "$OUT/include/cairo/"
+rm -f "$OUT/include/cairo/cairo-ft.h"
+cp src/cairo.h src/cairo-deprecated.h src/cairo-version.h "$FEATURES/cairo-features.h" "$OUT/include/cairo/"
+[ "$CAIRO_FONTS" = user ] || cp src/cairo-ft.h "$OUT/include/cairo/"

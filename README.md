@@ -22,7 +22,7 @@ for the library goes to its authors; see `upstream/` for their notices.
 
 ## What the Amiga port changes
 
-- No source changes to either. pixman is built from its portable C paths (68k has no SIMD) with a hand-written `config/pixman/pixman-config.h`. cairo is built without Meson from its source list, with image surfaces, PNG writing and the FreeType/fontconfig font backend (`config/cairo/config.h`, `config/cairo/cairo-features.h`).
+- No source changes to either. pixman is built from its portable C paths (68k has no SIMD) with a hand-written `config/pixman/pixman-config.h`. cairo is built without Meson from its source list, with image surfaces, PNG writing and the FreeType/fontconfig font backend (`config/cairo/config.h`, `config/cairo/cairo-features.h`), or with `CAIRO_FONTS=user` without that backend: user fonts only, for programs that draw their own glyphs (OpenBrowser draws OpenFont's outlines, openfont.library, through cairo user fonts).
 
 ## Building
 
@@ -35,10 +35,14 @@ tarballs from [SOURCES](SOURCES) in `tarballs/`. Then:
 ```
 
 The libraries and headers land in `out/` (set `PREFIX` to change that). The
-script prints which other settings it needs, if any. Needs a 68040
+script prints which other settings it needs, if any. `CAIRO_FONTS=user`
+builds cairo without FreeType and fontconfig (and leaves `cairo-ft.h` out);
+`DEPS_PREFIX` then needs only libpng and zlib. Needs a 68040
 with FPU (hard float, `-m68040 -m68881`), libnix (`-mcrt=nix20`).
 
 Link with: `-lcairo -lpixman-1 -lfontconfig -lfreetype -lexpat -lpng -lz -lpthread -latomic -lm`
+
+With `CAIRO_FONTS=user`: `-lcairo -lpixman-1 -lpng -lz -lpthread -latomic -lm`
 
 ## Tested
 
